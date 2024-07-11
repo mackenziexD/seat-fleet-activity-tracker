@@ -9,7 +9,7 @@ class FATServiceProvider extends AbstractSeatPlugin
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.php', 'seat-fleet-activity-tracker');
-        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar.tools.entries');
+        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
         $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'seat-fleet-activity-tracker');
 
         $this->app->singleton(SystemNameExtractor::class, function ($app) {
@@ -21,7 +21,7 @@ class FATServiceProvider extends AbstractSeatPlugin
     {
         $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
-        
+
     }
 
     /**
