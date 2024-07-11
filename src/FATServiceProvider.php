@@ -3,6 +3,7 @@
 namespace Helious\SeatFAT;
 
 use Seat\Services\AbstractSeatPlugin;
+use Illuminate\Support\Facades\App;
 
 class FATServiceProvider extends AbstractSeatPlugin
 {
@@ -11,14 +12,15 @@ class FATServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.php', 'seat-fleet-activity-tracker');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
         $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'seat-fleet-activity-tracker');
-
-        $this->app->singleton(SystemNameExtractor::class, function ($app) {
-            return new SystemNameExtractor();
-        });
     }
 
     public function boot()
     {
+        // Ensure that EveapiServiceProvider is loaded
+        if (!app()->bound('esi-client')) {
+            throw new \Exception('The EveapiServiceProvider is not loaded. Please ensure it is loaded before FATServiceProvider.');
+        }
+
         $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
 
