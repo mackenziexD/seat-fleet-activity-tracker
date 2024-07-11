@@ -51,15 +51,12 @@ class FATController extends Controller
 
   private function checkFleetIdIsCorrect($bossToken, $fleetId){
     $esi = app('esi-client')->get();
-
     try {
         $response = $esi->invoke('get', '/fleets/{fleet_id}/', [
             'fleet_id' => $fleetId,
             'token' => $bossToken
         ]);
-
         return true;
-
     } catch (\Exception $e) {
       return false;
     }
