@@ -1,0 +1,32 @@
+{
+  "name": "helious/seat-fleet-activity-tracker",
+  "type": "library",
+  "keywords": [
+      "helious",
+      "seat-fleet-activity-tracker"
+  ],
+  "authors": [
+      {
+          "name": "Helious",
+          "role": "Developer"
+      }
+  ],
+  "autoload": {
+      "psr-4": {
+          "Helious\\SeatFAT\\": "src/"
+      }
+  },
+  "require": {
+      "laravel/framework": "^10.0",
+      "eveseat/web": "^5.0",
+      "eveseat/eveapi": "^5.0",
+      "maatwebsite/excel": "^3.1"
+  },
+  "extra": {
+      "laravel": {
+          "providers": [ 
+              "Helious\\SeatFAT\\FATServiceProvider"
+          ]
+      }
+  }
+}
