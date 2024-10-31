@@ -19,7 +19,8 @@
     "require": {
         "laravel/framework": "^10.0",
         "eveseat/web": "^5.0",
-        "eveseat/eveapi": "^5.0"
+        "eveseat/eveapi": "^5.0",
+        "guzzlehttp/guzzle": "^7.2"
     },
     "extra": {
         "laravel": {

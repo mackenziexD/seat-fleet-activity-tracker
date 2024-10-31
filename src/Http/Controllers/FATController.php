@@ -6,6 +6,7 @@ use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Helious\SeatFAT\Models\Fleets;
 use Seat\Eveapi\Models\RefreshToken;
+use Seat\Services\Contracts\EsiClient;
 
 /**
  * Class HomeController.
@@ -29,14 +30,14 @@ class FATController extends Controller
   }
 
   public function trackPostRequest(Request $request){
-    $validated = $request->validate([
-        'fleet_name' => 'required|max:255',
-        'fleet_id' => 'required|integer',
-        'fleet_boss' => 'required',
-        'fleet_type' => 'nullable|array',
+    $request->validate([
+      'fleet_name' => 'required|max:255',
+      'fleet_id' => 'required|integer',
+      'fleet_boss' => 'required',
+      'fleet_type' => 'nullable|array',
     ]);
 
-    $bossToken = RefreshToken::where('character_id', $request->input('fleet_boss'));
+    $bossToken = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
 
     $fleet = $this->checkFleetIdIsCorrect($bossToken, $request->input('fleet_id'));
     if(!$fleet) return view('seat-fleet-activity-tracker::track')->with('error', 'Cant find matching fleet with supplied fleet id, you need to be in fleet and you need to be the fleet boss!');
@@ -50,12 +51,17 @@ class FATController extends Controller
   }
 
   private function checkFleetIdIsCorrect($bossToken, $fleetId){
-    $esi = app('esi-client')->get();
+    $authentication = new \Seat\Eseye\Containers\EsiAuthentication([
+      'client_id'     => env('EVE_CLIENT_ID'),
+      'secret'        => env('EVE_CLIENT_SECRET'),
+      'refresh_token' => $bossToken,
+    ]);
+    $esi = new \Seat\Eseye\Eseye($authentication);
     try {
         $response = $esi->invoke('get', '/fleets/{fleet_id}/', [
-            'fleet_id' => $fleetId,
-            'token' => $bossToken
+          'fleet_id' => $fleetId
         ]);
+        dd($response);
         return true;
     } catch (\Exception $e) {
       return false;

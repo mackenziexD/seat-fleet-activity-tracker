@@ -35,9 +35,9 @@
           </div>
           <div class="form-group">
             <label for="fleet_type">Fleet Type</label>
-            <select name="fleet_type" id="fleet_type" class="form-control">
+            <select name="fleet_type[]" id="fleet_type[]" class="form-control">
               <option value="" selected>Select Fleet Type</option>
-              <option value="1">Home Def</option>
+              <option value="HomeDef">Home Def</option>
             </select>
           </div>
 
