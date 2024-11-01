@@ -60,10 +60,13 @@ class FATController extends Controller
     ]);
 
     $fleetBoss = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
+    if(!$fleetBoss->token || !$fleetBoss->refresh_token){
+      return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Could not find fleet boss on seat, try to re-link the character.');
+    }
 
     $fleet = $this->checkFleetIdIsCorrect($fleetBoss, $request->input('fleet_id'));
     if (!$fleet) {
-        return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Only fleet boss can track a fleet!');
+      return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Only fleet boss can track a fleet!');
     }
 
     // Check if the fleet is already being tracked
@@ -113,7 +116,6 @@ class FATController extends Controller
 
         if ($response->getStatusCode() == 200) return $body;
     } catch (\Exception $e) {
-      dd($e);
         return false;
     }
   }

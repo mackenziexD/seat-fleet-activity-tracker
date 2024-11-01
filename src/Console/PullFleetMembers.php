@@ -5,6 +5,7 @@ namespace Helious\SeatFAT\Console;
 use Illuminate\Console\Command;
 use Helious\SeatFAT\Jobs\ProcessCharacters;
 use Helious\SeatFAT\Models\FATFleets;
+use Seat\Eveapi\Models\RefreshToken;
 
 /**
  * Class CheckBeaconFuel.
@@ -28,13 +29,19 @@ class PullFleetMembers extends Command
      */
     public function handle()
     {
-        $fleets = FATFleets::where('fleetActive', true)->get();
-        
-        foreach ($fleets as $fleet) {
-          ProcessCharacters::dispatch($fleet->fleetID)
-            ->onQueue('default');
-        }
+      $fleets = FATFleets::where('fleetActive', true)->get();
+      
+      foreach ($fleets as $fleet) {
+        $token = RefreshToken::where('character_id', $fleet->fleetCommander)->first();
 
-        $this->info('Jobs dispatched for active fleets.');
+        if ($token) {
+          ProcessCharacters::dispatch($fleet->fleetID, $token)
+            ->onQueue('default');
+        } else {
+          $this->warn("No refresh token found for fleet commander ID {$fleet->fleetCommander}");
+        }
+      }
+  
+      $this->info('Jobs dispatched for active fleets.');
     }
 }
