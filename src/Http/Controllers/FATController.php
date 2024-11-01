@@ -87,7 +87,6 @@ class FATController extends Controller
       return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Only fleet boss can track a fleet!');
     }
 
-    // Check if the fleet is already being tracked
     $existingFleet = FATFleets::where('fleetID', $fleet->fleet_id)
         ->where('fleetCommander', $fleetBoss->character_id)
         ->where('fleetActive', true)
@@ -97,7 +96,6 @@ class FATController extends Controller
         return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'This fleet is already being tracked.'); // Inform the user that the fleet is already being tracked
     }
 
-    // Save the fleet details
     $savedFleet = FATFleets::create([
         'fleetName' => $request->input('fleet_name'),
         'fleetType' => $request->input('fleet_type'),
@@ -148,88 +146,121 @@ class FATController extends Controller
 
   public function stats()
   {
-    $fatsEntries = FATS::with(['character.affiliation'])
-        ->get();
-
-    $monthlyStats = [];
-    $yearlyStats = [];
-
-    foreach ($fatsEntries as $fat) {
-        $createdAt = $fat->created_at;
-        $monthYear = $createdAt->format('Y-m');
-        $year = $createdAt->format('Y'); 
-        
-        // Group by corporation
-        $corporationId = $fat->character->affiliation->corporation_id;
-        $corporationName = $fat->character->affiliation->corporation->name;
-
-        // Monthly Stats
-        if (!isset($monthlyStats[$monthYear][$corporationId])) {
-            $monthlyStats[$monthYear][$corporationId] = [
-                'corporation_name' => $corporationName,
-                'fats_count' => 0,
-                'member_count' => 0,
-            ];
-        }
-        $monthlyStats[$monthYear][$corporationId]['fats_count']++;
-
-        // Yearly Stats
-        if (!isset($yearlyStats[$year][$corporationId])) {
-            $yearlyStats[$year][$corporationId] = [
-                'corporation_name' => $corporationName,
-                'fats_count' => 0,
-                'member_count' => 0,
-            ];
-        }
-        $yearlyStats[$year][$corporationId]['fats_count']++;
-    }
-
-    // Fetch member counts from corporation_infos
-    $corporationInfos = \DB::table('corporation_infos')
-        ->select('corporation_id', 'member_count')
-        ->get()
-        ->keyBy('corporation_id');
-
-    // Calculate averages and populate stats
-    foreach ($monthlyStats as $month => $corporations) {
-      foreach ($corporations as $corporationId => $data) {
-          if (isset($corporationInfos[$corporationId])) {
-              $memberCount = $corporationInfos[$corporationId]->member_count;
-              $monthlyStats[$month][$corporationId]['member_count'] = $memberCount;
-              $monthlyStats[$month][$corporationId]['avg_pap'] = $memberCount > 0
-                  ? round($data['fats_count'] / $memberCount, 2) // Round to 2 decimal places
-                  : 0; // Avoid division by zero
+      $fleets = FATFleets::where('created_at', '>=', now()->subDays(30))->get();
+      $fatsEntries = FATS::with(['character.affiliation'])->get();
+  
+      $monthlyStats = [];
+      $dailyFats = [];
+      $dailyFleets = [];
+      $topFCs = [];
+      $topCorps = [];
+      $corpSizes = []; 
+      $otherData = []; 
+      $timezoneSplit = [
+          'EU' => 0,
+          'AU' => 0,
+          'US' => 0,
+      ];
+  
+      // Generate a 3-year rolling range of months
+      $currentDate = now();
+      for ($i = 0; $i < 36; $i++) {
+          $month = $currentDate->copy()->subMonths($i)->format('Y-m');
+          $monthlyStats[$month] = 0; 
+      }
+  
+      // Generate a 1-month rolling range of days
+      $currentDate = now();
+      for ($i = 0; $i < 30; $i++) {
+          $day = $currentDate->copy()->subDays($i)->format('Y-m-d');
+          $dailyFats[$day] = 0; 
+          $dailyFleets[$day] = 0; 
+      }
+  
+      // Calculate Daily Fleets from the last 30 days of fleets
+      foreach ($fleets as $fleet) {
+          $day = $fleet->created_at->format('Y-m-d');
+          if (isset($dailyFleets[$day])) {
+              $dailyFleets[$day]++;
           }
-        }
-    }
-    
-    foreach ($yearlyStats as $year => $corporations) {
-        foreach ($corporations as $corporationId => $data) {
-            if (isset($corporationInfos[$corporationId])) {
-                $memberCount = $corporationInfos[$corporationId]->member_count;
-                $yearlyStats[$year][$corporationId]['member_count'] = $memberCount;
-                $yearlyStats[$year][$corporationId]['avg_pap'] = $memberCount > 0
-                    ? round($data['fats_count'] / $memberCount, 2) // Round to 2 decimal places
-                    : 0; // Avoid division by zero
-            }
-        }
-    }
+  
+          // For Top FCs
+          $fcName = $fleet->fleet_commander->name;
+          if (!isset($topFCs[$fcName])) {
+              $topFCs[$fcName] = 0;
+          }
+          $topFCs[$fcName]++;
+      }
+  
+      // Monthly Stats and Daily Fats from all FATS entries
+      foreach ($fatsEntries as $fat) {
+          $createdAt = $fat->created_at;
+          $monthYear = $createdAt->format('Y-m');
+          $day = $createdAt->format('Y-m-d');
+  
+          // For Monthly Total Fats
+          if (isset($monthlyStats[$monthYear])) {
+              $monthlyStats[$monthYear]++;
+          }
+  
+          // For Daily Fats
+          if (isset($dailyFats[$day])) {
+              $dailyFats[$day]++;
+          }
+  
+          // Group by corporation
+          $corporationId = $fat->character->affiliation->corporation_id;
+          $corporationName = $fat->character->affiliation->corporation->name;
+  
+          if (!isset($topCorps[$corporationName])) {
+              $topCorps[$corporationName] = 0;
+          }
+          $topCorps[$corporationName]++;
+  
+          // For Timezone FAT Split
+          $hour = (int) $createdAt->format('H');
+          if ($hour >= 0 && $hour < 8) {
+              $timezoneSplit['US']++;
+          } elseif ($hour >= 8 && $hour < 16) {
+              $timezoneSplit['AU']++;
+          } else {
+              $timezoneSplit['EU']++;
+          }
+      }
+  
+      // Fetch member counts for only the top corporations using their names
+      $corporationNames = array_keys($topCorps);
+      $corporationInfos = \DB::table('corporation_infos')
+          ->whereIn('name', $corporationNames)
+          ->select('name', 'corporation_id', 'member_count') 
+          ->get()
+          ->keyBy('name'); 
 
-    // Format the stats for easier rendering
-    $formattedMonthlyStats = [];
-    foreach ($monthlyStats as $month => $corporations) {
-        $formattedMonthlyStats[$month] = array_values($corporations);
-    }
+      // Prepare data for FATS Relative To Corp Size
+      foreach ($topCorps as $corporationName => $fatsCount) {
+          $corporationInfo = $corporationInfos->get($corporationName);
 
-    $formattedYearlyStats = [];
-    foreach ($yearlyStats as $year => $corporations) {
-        $formattedYearlyStats[$year] = array_values($corporations);
-    }
+          if ($corporationInfo) {
+              $size = $corporationInfo->member_count;
+              $corpSizes[$corporationName] = $size;
+              $otherData[$corporationName] = $size > 0 ? round(($fatsCount / $size) * 100, 2) : 0;
+          }
+      }
 
-    return view('seat-fleet-activity-tracker::stats', [
-      'monthlyStats' => $formattedMonthlyStats,
-      'yearlyStats' => $formattedYearlyStats,
-    ]);
-  }
+      // Sort in descending order for top corporations
+      arsort($topCorps);
+  
+      return view('seat-fleet-activity-tracker::stats', [
+          'monthlyStats' => $monthlyStats,
+          'dailyFats' => $dailyFats, 
+          'dailyFleets' => $dailyFleets, 
+          'timezoneSplit' => $timezoneSplit,
+          'topCorps' => $topCorps,
+          'topFCs' => $topFCs,
+          'corpSizes' => $corpSizes, 
+          'otherData' => $otherData 
+      ]);
+  }   
+  
 
 }
