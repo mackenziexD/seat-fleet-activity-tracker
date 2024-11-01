@@ -4,9 +4,10 @@ namespace Helious\SeatFAT\Http\Controllers;
 
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Helious\SeatFAT\Models\Fleets;
+use Helious\SeatFAT\Models\FATFleets;
 use Seat\Eveapi\Models\RefreshToken;
 use Seat\Services\Contracts\EsiClient;
+use Helious\SeatFAT\Services\FATEsiToken;
 
 /**
  * Class HomeController.
@@ -15,6 +16,16 @@ use Seat\Services\Contracts\EsiClient;
  */
 class FATController extends Controller
 {
+  
+  /**
+   * @var \Seat\Services\Contracts\EsiClient
+   */
+  private EsiClient $esi;
+
+  public function __construct(EsiClient $client)
+  {
+      $this->esi = $client;
+  }
 
   public function index(){
     return view('seat-fleet-activity-tracker::index');
@@ -42,30 +53,35 @@ class FATController extends Controller
     $fleet = $this->checkFleetIdIsCorrect($bossToken, $request->input('fleet_id'));
     if(!$fleet) return view('seat-fleet-activity-tracker::track')->with('error', 'Cant find matching fleet with supplied fleet id, you need to be in fleet and you need to be the fleet boss!');
 
-    $savedFleet = Fleets::Create([
+    $savedFleet = FATFleets::Create([
       'fleetName' => $request->input('fleet_name'),
-      'fleetType' => $request->input('fleet_type')
+      'fleetType' => $request->input('fleet_type'),
+      'fletActive' => true,
     ]);
 
     return route('seat-fleet-activity-tracker::fleet', ['id'=> $savedFleet->id]);
   }
 
-  private function checkFleetIdIsCorrect($bossToken, $fleetId){
-    $authentication = new \Seat\Eseye\Containers\EsiAuthentication([
-      'client_id'     => env('EVE_CLIENT_ID'),
-      'secret'        => env('EVE_CLIENT_SECRET'),
-      'refresh_token' => $bossToken,
-    ]);
-    $esi = new \Seat\Eseye\Eseye($authentication);
-    try {
-        $response = $esi->invoke('get', '/fleets/{fleet_id}/', [
-          'fleet_id' => $fleetId
-        ]);
-        dd($response);
-        return true;
-    } catch (\Exception $e) {
-      return false;
-    }
+  private function checkFleetIdIsCorrect($bossToken, $fleetId)
+  {
+      try {
+          $esiToken = new FATEsiToken();
+          $esiToken->setAccessToken($bossToken->token);
+          $esiToken->setRefreshToken($bossToken->refresh_token);
+          
+          if ($bossToken->expires_on) {
+              $esiToken->setExpiresOn(new \DateTime($bossToken->expires_on));
+          }
+          
+          $this->esi->setAuthentication($esiToken);
+          $response = $this->esi->invoke('get', '/fleets/{fleet_id}/', [
+              'fleet_id' => $fleetId,
+          ]);
+
+          if ($response->status_code == 200) return true;
+      } catch (\Exception $e) {
+          return false;
+      }
   }
 
 }

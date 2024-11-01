@@ -20,6 +20,7 @@ class FATServiceProvider extends AbstractSeatPlugin
 
         $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
     }
 
