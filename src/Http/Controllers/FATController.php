@@ -78,7 +78,7 @@ class FATController extends Controller
               'fleet_id' => $fleetId,
           ]);
 
-          if ($response->status_code == 200) return true;
+          if ($response->getStatusCode() == 200) return true;
       } catch (\Exception $e) {
           return false;
       }
