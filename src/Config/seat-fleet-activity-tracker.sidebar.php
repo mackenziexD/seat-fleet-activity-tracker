@@ -20,6 +20,14 @@ return [
                 ],
             ],
             [
+                'name' => 'All Fleets',
+                'icon' => 'fas fa-clock',
+                'route' => 'seat-fleet-activity-tracker::allFleets',
+                'permission' => [
+                  'seat-fleet-activity-tracker.allFleets',
+                ],
+            ],
+            [
               'name' => 'About',
               'icon' => 'fas fa-info',
               'route' => 'seat-fleet-activity-tracker::about'

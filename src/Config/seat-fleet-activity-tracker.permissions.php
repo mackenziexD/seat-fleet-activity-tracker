@@ -7,5 +7,9 @@ return [
     'track' => [
       'label' => 'Track Fleet',
       'description' => 'Permission to start tracking a fleet.',
+    ],
+    'allFleets' => [
+      'label' => 'See All Recent Fleets',
+      'description' => 'Permission to see all previous fatted fleets.',
     ]
 ];

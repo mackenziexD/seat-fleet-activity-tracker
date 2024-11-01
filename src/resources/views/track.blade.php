@@ -21,10 +21,6 @@
             <input type="text" name="fleet_name" id="fleet_name" class="form-control" placeholder="Enter Fleet Name">
           </div>
           <div class="form-group">
-            <label for="fleet_id">Fleet ID*</label>
-            <input type="text" name="fleet_id" id="fleet_id" class="form-control" placeholder="Enter Fleet ID">
-          </div>
-          <div class="form-group">
             <label for="fleet_boss">Fleet Boss*</label>
             <select name="fleet_boss" id="fleet_boss" class="form-control select2" style="width: 100%;">
               <option value="" selected>Select Fleet Type</option>
@@ -55,7 +51,7 @@
   $("#fleet_boss").select2();
 </script>
 
-<script>
+<!-- <script>
 function parseFleetURL(fleet_str)
 {
   var fleet_id = null;
@@ -84,7 +80,7 @@ $('input#fleet_id').on('paste', function(e){
   }
   //console.log(pasteData);
 });
-</script>
+</script> -->
 @endpush
 
 @stop

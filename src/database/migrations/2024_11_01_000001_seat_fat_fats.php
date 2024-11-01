@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class SeatFatInitialDeployment extends Migration
+class SeatFatFats extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class SeatFatInitialDeployment extends Migration
      */
     public function up()
     {
-        Schema::create('seat_fat_fleets', function (Blueprint $table) {
+        Schema::create('seat_fats', function (Blueprint $table) {
             $table->increments('id');
+            $table->bigInteger('character_id');
+            $table->bigInteger('solar_system_id');
+            $table->bigInteger('ship_type_id');
             $table->bigInteger('fleetID');
-            $table->text('fleetName');
-            $table->text('fleetType');
-            $table->integer('fleetCommander');
-            $table->boolean('fletActive')->default(true);
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ class SeatFatInitialDeployment extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('seat_fat_fleets');
+        Schema::dropIfExists('seat_fats');
     }
 }

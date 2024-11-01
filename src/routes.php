@@ -3,7 +3,7 @@
 Route::group([
 
     'namespace' => 'Helious\SeatFAT\Http\Controllers',
-    'prefix' => 'fleet',
+    'prefix' => 'fats',
     'middleware' => [
         'web',
         'auth',
@@ -26,7 +26,12 @@ Route::group([
         'as' => 'seat-fleet-activity-tracker::trackPostRequest',
     ]);
 
-    Route::get('/fleet/{id}', [
+    Route::get('/fleets', [
+        'uses' => 'FATController@AllFleets',
+        'as' => 'seat-fleet-activity-tracker::allFleets',
+    ]);
+
+    Route::get('/track_fleet/{id}', [
         'uses' => 'FATController@fleet',
         'as' => 'seat-fleet-activity-tracker::fleet',
     ]);

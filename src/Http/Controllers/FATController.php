@@ -5,6 +5,7 @@ namespace Helious\SeatFAT\Http\Controllers;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Helious\SeatFAT\Models\FATFleets;
+use Helious\SeatFAT\Models\FATs;
 use Seat\Eveapi\Models\RefreshToken;
 use Seat\Services\Contracts\EsiClient;
 use Helious\SeatFAT\Services\FATEsiToken;
@@ -27,9 +28,20 @@ class FATController extends Controller
       $this->esi = $client;
   }
 
-  public function index(){
+  public function index() {
+    // $characters = auth()->user()->characters;
+    // $characterIds = $characters->pluck('character_id')->toArray(); 
+    // $fleets = FATS::whereIn('character_id', $characterIds)->get();
+
     return view('seat-fleet-activity-tracker::index');
   }
+
+  public function allFleets() {
+    $fleets = FATFleets::all();
+
+    return view('seat-fleet-activity-tracker::allFleets', compact('fleets'));
+  }
+
 
   public function about(){
     return view('seat-fleet-activity-tracker::about');
@@ -40,54 +52,70 @@ class FATController extends Controller
     return view('seat-fleet-activity-tracker::track', compact('characters'));
   }
 
-  public function trackPostRequest(Request $request){
+  public function trackPostRequest(Request $request) {
     $request->validate([
-      'fleet_name' => 'required|max:255',
-      'fleet_id' => 'required|integer',
-      'fleet_boss' => 'required',
-      'fleet_type' => 'nullable',
+        'fleet_name' => 'required|max:255',
+        'fleet_boss' => 'required',
+        'fleet_type' => 'nullable',
     ]);
 
-    $bossToken = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
+    $fleetBoss = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
 
-    $fleet = $this->checkFleetIdIsCorrect($bossToken, $request->input('fleet_id'));
-    if(!$fleet) return view('seat-fleet-activity-tracker::track')->with('error', 'Cant find matching fleet with supplied fleet id, you need to be in fleet and you need to be the fleet boss!');
+    $fleet = $this->checkFleetIdIsCorrect($fleetBoss, $request->input('fleet_id'));
+    if (!$fleet) {
+        return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Only fleet boss can track a fleet!');
+    }
 
-    $savedFleet = FATFleets::Create([
-      'fleetName' => $request->input('fleet_name'),
-      'fleetType' => $request->input('fleet_type'),
-      'fleetCommander' => $bossToken->character_id,
-      'fletActive' => true,
+    // Check if the fleet is already being tracked
+    $existingFleet = FATFleets::where('fleetID', $fleet->fleet_id)
+        ->where('fleetCommander', $fleetBoss->character_id)
+        ->where('fletActive', true)
+        ->first();
+
+    if ($existingFleet) {
+        return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'This fleet is already being tracked.'); // Inform the user that the fleet is already being tracked
+    }
+
+    // Save the fleet details
+    $savedFleet = FATFleets::create([
+        'fleetName' => $request->input('fleet_name'),
+        'fleetType' => $request->input('fleet_type'),
+        'fleetID' => $fleet->fleet_id,
+        'fleetCommander' => $fleetBoss->character_id,
+        'fletActive' => true,
     ]);
 
-    return route('seat-fleet-activity-tracker::fleet', ['id'=> $savedFleet->id]);
+    return redirect()->route('seat-fleet-activity-tracker::fleet', ['id' => $savedFleet->fleetID]);
   }
+
 
   public function fleet($id) {
-
-    return view('seat-fleet-activity-tracker::track', compact('characters'));
+    $fleet = FATFleets::where('fleetID', $id)->firstOrFail();
+    return view('seat-fleet-activity-tracker::fleet', compact('fleet'));
   }
 
-  private function checkFleetIdIsCorrect($bossToken, $fleetId)
+  private function checkFleetIdIsCorrect($fleetBoss)
   {
-      try {
-          $esiToken = new FATEsiToken();
-          $esiToken->setAccessToken($bossToken->token);
-          $esiToken->setRefreshToken($bossToken->refresh_token);
-          
-          if ($bossToken->expires_on) {
-              $esiToken->setExpiresOn(new \DateTime($bossToken->expires_on));
-          }
-          
-          $this->esi->setAuthentication($esiToken);
-          $response = $this->esi->invoke('get', '/fleets/{fleet_id}/', [
-              'fleet_id' => $fleetId,
-          ]);
+    try {
+        $esiToken = new FATEsiToken();
+        $esiToken->setAccessToken($fleetBoss->token);
+        $esiToken->setRefreshToken($fleetBoss->refresh_token);
+        
+        if ($fleetBoss->expires_on) {
+          $esiToken->setExpiresOn(new \DateTime($fleetBoss->expires_on));
+        }
+        
+        $this->esi->setAuthentication($esiToken);
+        $response = $this->esi->invoke('get', '/characters/{character_id}/fleet/', [
+          'character_id' => $fleetBoss->character_id,
+        ]);
+        $body = $response->getBody();
 
-          if ($response->getStatusCode() == 200) return true;
-      } catch (\Exception $e) {
-          return false;
-      }
+        if ($response->getStatusCode() == 200) return $body;
+    } catch (\Exception $e) {
+      dd($e);
+        return false;
+    }
   }
 
 }

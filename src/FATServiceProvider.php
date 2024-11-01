@@ -3,6 +3,7 @@
 namespace Helious\SeatFAT;
 
 use Seat\Services\AbstractSeatPlugin;
+use Helious\SeatFAT\Console\PullFleetMembers;
 
 class FATServiceProvider extends AbstractSeatPlugin
 {
@@ -17,11 +18,19 @@ class FATServiceProvider extends AbstractSeatPlugin
 
     public function boot()
     {
+        $this->addCommands();
 
         $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
+    }
+
+    private function addCommands() 
+    {
+        $this->commands([
+            PullFleetMembers::class,
+        ]);
     }
 
     /**
