@@ -45,7 +45,7 @@ class FATController extends Controller
       'fleet_name' => 'required|max:255',
       'fleet_id' => 'required|integer',
       'fleet_boss' => 'required',
-      'fleet_type' => 'nullable|array',
+      'fleet_type' => 'nullable',
     ]);
 
     $bossToken = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
@@ -56,10 +56,16 @@ class FATController extends Controller
     $savedFleet = FATFleets::Create([
       'fleetName' => $request->input('fleet_name'),
       'fleetType' => $request->input('fleet_type'),
+      'fleetCommander' => $bossToken->character_id,
       'fletActive' => true,
     ]);
 
     return route('seat-fleet-activity-tracker::fleet', ['id'=> $savedFleet->id]);
+  }
+
+  public function fleet($id) {
+
+    return view('seat-fleet-activity-tracker::track', compact('characters'));
   }
 
   private function checkFleetIdIsCorrect($bossToken, $fleetId)
