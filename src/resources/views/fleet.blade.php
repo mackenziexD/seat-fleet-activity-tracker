@@ -29,10 +29,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>{ShipTypes}</td>
-              <td>{Numbers}</td>
-            </tr>
+            @foreach($shipTypeCounts as $typeName => $count)
+              <tr>
+                <td>{{ $typeName }}</td>
+                <td>{{ $count }}</td>
+              </tr>
+            @endforeach
           </tbody>
         </table>
       </div>
@@ -57,7 +59,15 @@
           <tbody>
             @foreach($members as $member)
             <tr>
-              <td>{{$member->character->name}}</td>
+              <td>
+                <img src="//images.evetech.net/characters/{{ $member->character_id }}/portrait?size=64" class="img-circle eve-icon small-icon">
+                {{$member->character->name ?? 'Unknown Character'}}
+              </td>
+              <td>{{$member->solar_system->name}}</td>
+              <td>
+                <img src="//images.evetech.net/types/{{ $member->ship->typeID }}/icon?size=64" class="img-circle eve-icon small-icon">
+                {{$member->ship->typeName}}
+              </td>
             </tr>
             @endforeach
           </tbody>

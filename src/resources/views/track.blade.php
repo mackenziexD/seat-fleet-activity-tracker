@@ -50,37 +50,6 @@
 <script>
   $("#fleet_boss").select2();
 </script>
-
-<!-- <script>
-function parseFleetURL(fleet_str)
-{
-  var fleet_id = null;
-  if(fleet_str.substr(0, 4) == "http")
-  {
-    var fleets_idx = fleet_str.indexOf('/fleets/');
-    if(fleets_idx == -1) {
-      displayStatus("Invalid Fleet URL");
-      return null;
-    }
-    fleet_id = fleet_str.substring(fleets_idx + 8, fleet_str.lastIndexOf('/'));
-  } else if(isNaN(fleet_str)) {
-    displayStatus("Invalid Fleet ID");
-    return null;
-  } else{
-    fleet_id = fleet_str;
-  }
-  return fleet_id;
-}
-
-$('input#fleet_id').on('paste', function(e){
-  var pasteData = e.originalEvent.clipboardData.getData('text');
-  if(pasteData != null) {
-      $('input#fleet_id').val(parseFleetURL(pasteData));
-      return false;
-  }
-  //console.log(pasteData);
-});
-</script> -->
 @endpush
 
 @stop

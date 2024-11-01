@@ -18,7 +18,7 @@
                             <th>Fleet Name</th>
                             <th>Fleet Type</th>
                             <th>Fleet Commander</th>
-                            <th>Actions</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,7 +33,7 @@
                                     <td>{{ $fleet->fleetType }}</td>
                                     <td>{{ $fleet->fleet_commander ? $fleet->fleet_commander->name : 'N/A' }}</td>
                                     <td>
-                                        <a href="{{ route('seat-fleet-activity-tracker::fleet', $fleet->id) }}">
+                                        <a href="{{ route('seat-fleet-activity-tracker::fleet', $fleet->fleetID) }}">
                                           <button class="btn btn-primary">View</button>
                                         </a>
                                     </td>
@@ -54,7 +54,6 @@
 <script src="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"></script>
 <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
 <script>
-  // once the datatable is drawn if any of the 3rd column values are less than 7 days, highlight the row
   $(document).ready(function() {
     var table = $('#fleets-table').DataTable();
   });

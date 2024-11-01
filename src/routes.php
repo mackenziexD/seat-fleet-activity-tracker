@@ -16,6 +16,11 @@ Route::group([
         'as' => 'seat-fleet-activity-tracker::index',
     ]);
 
+    Route::get('/stats', [
+        'uses' => 'FATController@stats',
+        'as' => 'seat-fleet-activity-tracker::stats',
+    ]);
+
     Route::get('/track-fleet', [
         'uses' => 'FATController@trackFleet',
         'as' => 'seat-fleet-activity-tracker::trackFleet',
@@ -34,11 +39,6 @@ Route::group([
     Route::get('/track_fleet/{id}', [
         'uses' => 'FATController@fleet',
         'as' => 'seat-fleet-activity-tracker::fleet',
-    ]);
-
-    Route::get('/about', [
-        'uses' => 'FATController@about',
-        'as' => 'seat-fleet-activity-tracker::about',
     ]);
 
 });

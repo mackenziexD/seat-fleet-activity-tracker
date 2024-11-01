@@ -20,17 +20,20 @@ return [
                 ],
             ],
             [
+                'name' => 'Stats',
+                'icon' => 'fas fa-chart-pie',
+                'route' => 'seat-fleet-activity-tracker::stats',
+                'permission' => [
+                  'seat-fleet-activity-tracker.stats',
+                ],
+            ],
+            [
                 'name' => 'All Fleets',
                 'icon' => 'fas fa-clock',
                 'route' => 'seat-fleet-activity-tracker::allFleets',
                 'permission' => [
                   'seat-fleet-activity-tracker.allFleets',
                 ],
-            ],
-            [
-              'name' => 'About',
-              'icon' => 'fas fa-info',
-              'route' => 'seat-fleet-activity-tracker::about'
             ]
         ],
     ],
