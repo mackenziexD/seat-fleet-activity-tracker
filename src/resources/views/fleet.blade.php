@@ -55,7 +55,11 @@
               </tr>
           </thead>
           <tbody>
-
+            @foreach($members as $member)
+            <tr>
+              <td>{{$member->character->name}}</td>
+            </tr>
+            @endforeach
           </tbody>
         </table>
 

@@ -4,12 +4,14 @@ namespace Helious\SeatFAT\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Seat\Eveapi\Models\Character\CharacterInfo;
+use Seat\Eveapi\Models\Sde\InvType;
 use Seat\Eveapi\Models\Sde\SolarSystem;
+use Seat\Eveapi\Models\Universe\UniverseName;
 
 class FATS extends Model
 {
 
-    protected $table = 'seat_fat_fleets';
+    protected $table = 'seat_fats';
 
     protected $fillable = [
         'character_id',

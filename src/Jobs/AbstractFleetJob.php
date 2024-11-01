@@ -7,10 +7,12 @@ use Seat\Eveapi\Jobs\EsiBase;
 abstract class AbstractFleetJob extends EsiBase
 {
     protected $fleet_id;
+    protected $token;
 
-    public function __construct(int $fleet_id)
+    public function __construct(int $fleet_id, $token)
     {
-      parent::__construct(); 
+      parent::__construct();
+      $this->token = $token;
       $this->fleet_id = $fleet_id;
     }
 

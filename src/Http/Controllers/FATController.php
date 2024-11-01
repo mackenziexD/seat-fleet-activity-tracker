@@ -5,7 +5,7 @@ namespace Helious\SeatFAT\Http\Controllers;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Helious\SeatFAT\Models\FATFleets;
-use Helious\SeatFAT\Models\FATs;
+use Helious\SeatFAT\Models\FATS;
 use Seat\Eveapi\Models\RefreshToken;
 use Seat\Services\Contracts\EsiClient;
 use Helious\SeatFAT\Services\FATEsiToken;
@@ -94,7 +94,8 @@ class FATController extends Controller
 
   public function fleet($id) {
     $fleet = FATFleets::where('fleetID', $id)->firstOrFail();
-    return view('seat-fleet-activity-tracker::fleet', compact('fleet'));
+    $members = FATS::where('fleetID', $id)->with('character', 'solar_system', 'ship')->get();
+    return view('seat-fleet-activity-tracker::fleet', compact('fleet', 'members'));
   }
 
   private function checkFleetIdIsCorrect($fleetBoss)

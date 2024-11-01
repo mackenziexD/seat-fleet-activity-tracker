@@ -19,6 +19,7 @@ class SeatFatFats extends Migration
             $table->bigInteger('solar_system_id');
             $table->bigInteger('ship_type_id');
             $table->bigInteger('fleetID');
+            $table->unique(['character_id', 'fleetID'], 'unique_character_fleet');
             $table->timestamps();
         });
     }
