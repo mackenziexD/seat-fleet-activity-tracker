@@ -4,7 +4,7 @@ namespace Helious\SeatFAT\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FATFleet extends Model
+class FATFleets extends Model
 {
 
     protected $table = 'seat_fat_fleets';
