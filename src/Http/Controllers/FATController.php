@@ -69,7 +69,7 @@ class FATController extends Controller
     // Check if the fleet is already being tracked
     $existingFleet = FATFleets::where('fleetID', $fleet->fleet_id)
         ->where('fleetCommander', $fleetBoss->character_id)
-        ->where('fletActive', true)
+        ->where('fleetActive', true)
         ->first();
 
     if ($existingFleet) {
@@ -82,7 +82,7 @@ class FATController extends Controller
         'fleetType' => $request->input('fleet_type'),
         'fleetID' => $fleet->fleet_id,
         'fleetCommander' => $fleetBoss->character_id,
-        'fletActive' => true,
+        'fleetActive' => true,
     ]);
 
     return redirect()->route('seat-fleet-activity-tracker::fleet', ['id' => $savedFleet->fleetID]);

@@ -19,7 +19,7 @@ class SeatFatInitialDeployment extends Migration
             $table->text('fleetName');
             $table->text('fleetType');
             $table->integer('fleetCommander');
-            $table->boolean('fletActive')->default(true);
+            $table->boolean('fleetActive')->default(true);
             $table->timestamps();
         });
     }

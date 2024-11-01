@@ -14,7 +14,7 @@ class FATFleets extends Model
         'fleetID',
         'fleetName',
         'fleetType',
-        'fletActive',
+        'fleetActive',
         'fleetCommander',
     ];
 
