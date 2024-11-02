@@ -2,6 +2,8 @@
 > This package is no where near finished so dont use it.
 
 # SeAT-Fleet-Activity-Tracker - Fleet Tracking plugin for SeAT
+![](https://img.shields.io/github/v/release/mackenziexD/seat-fleet-activity-tracker?style=for-the-badge&label=VERSION&color=%252328a3df)
+[![Total Downloads](https://img.shields.io/packagist/dt/helious/seat-fleet-activity-tracker.svg?style=for-the-badge)](https://packagist.org/packages/helious/seat-fleet-activity-tracker)
 
 ## Installation
 
