@@ -10,7 +10,7 @@
 ### Important
 FC's need scope `esi-fleets.read_fleet.v1` if they want to pap fleets. if you changed your Single Sign-on SSO scopes under settings you will need to add the scopes back and any characters that will be used to track fleets will have to be re-linked to update the tokens so they have the scopes needed.
 
-#### Step 1: Install
+### Step 1: Install
 You can install the package via composer:
 ```bash
 composer require helious/seat-fleet-activity-tracker
@@ -20,10 +20,10 @@ or via docker
 SEAT_PLUGINS=helious/seat-fleet-activity-tracker
 ```
 
-#### Step 2: Schedule
+### Step 2: Schedule
 Create a new schedule under `Settings > Schedule` and select `fats:update:fleets` running `every minute`. this will run the command that runs the job to pull fleet members from an active fleet.
 
-### Permissions
+## Permissions
 | Name | Description |
 | --- | --- |
 | access | Permission to access the FATs. |
@@ -31,7 +31,7 @@ Create a new schedule under `Settings > Schedule` and select `fats:update:fleets
 | allFleets | Permission to see all previous fatted fleets. |
 | stats | Permission to see corp stats. |
 
-### Todo
+## Todo
 - [ ] Ajax for tracked fleets to autopull updates, saves having to refresh.
 - [ ] Select corps to track paps for, currently the way its pulling is messy.
 - [ ] Ability to delete ships from paps/papped fleets.
