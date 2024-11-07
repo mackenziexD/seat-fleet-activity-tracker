@@ -123,6 +123,11 @@ class FATController extends Controller
 
   private function checkFleetIdIsCorrect($fleetBoss)
   {
+    /**
+     * This method bypasses the job queue to ensure the fleet ID is available immediately, 
+     * avoiding delays and manual input. While most ESI calls are deferred to jobs to handle 
+     * rate limits, this retrieval is crucial for real-time operations, so it's executed directly.
+     */
     try {
         $esiToken = new FATEsiToken();
         $esiToken->setAccessToken($fleetBoss->token);
