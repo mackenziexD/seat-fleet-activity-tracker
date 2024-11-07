@@ -10,6 +10,6 @@ class CharacterInfos extends CharacterInfo
 {
   public function corporation()
   {
-      return $this->belongsTo(CorporationInfo::class, 'corporation_id', 'corporation_id'); // Ensure this is correct
+      return $this->belongsTo(CorporationInfo::class, 'corporation_id', 'corporation_id');
   }
 }
