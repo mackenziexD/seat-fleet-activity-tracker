@@ -93,7 +93,7 @@ class FATController extends Controller
         ->first();
 
     if ($existingFleet) {
-        return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'This fleet is already being tracked.'); // Inform the user that the fleet is already being tracked
+        return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'This fleet is already being tracked.');
     }
 
     $savedFleet = FATFleets::create([
@@ -146,6 +146,8 @@ class FATController extends Controller
 
   public function stats()
   {
+      // Hate i have done this, want to rewrite it all.
+    
       $fleets = FATFleets::where('created_at', '>=', now()->subDays(30))->get();
       $fatsEntries = FATS::with(['character.affiliation'])->get();
   
