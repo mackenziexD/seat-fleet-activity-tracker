@@ -94,7 +94,7 @@
 @stop
 
 @push('javascript')
-<script src="{{ asset('web/js/chart.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -106,6 +106,7 @@
         const topCorps = @json($topCorps);
         const corpSizes = @json($corpSizes);
         const otherData = @json($otherData);
+        console.log(Chart.version);
 
         // Monthly Total Fats - Vertical Bar Chart
         new Chart(document.getElementById('monthlyTotalFats'), {
@@ -208,19 +209,19 @@
                     backgroundColor: 'rgba(39, 174, 96, 0.8)',
                 }]
             },
-            options: {
-                indexAxis: 'y',
-                maintainAspectRatio: false, 
-                responsive: true,
-                scales: {
-                    x: { beginAtZero: true },
-                    y: { grid: { display: false } },
-                }
-            }
+          options: {
+              indexAxis: 'y', 
+              maintainAspectRatio: false,
+              responsive: true,
+              scales: {
+                  x: { beginAtZero: true },
+                  y: { grid: { display: false } },
+              }
+          }
         });
 
 
-        // Top FCs - Vertical Bar Chart
+        // Top FCs - Horizontal Bar Chart
         new Chart(document.getElementById('TopFCs'), {
             type: 'bar',
             data: {
@@ -242,37 +243,45 @@
         new Chart(document.getElementById('FatsRelativeToCorpSize'), {
             type: 'bar',
             data: {
-                labels: Object.keys(corpSizes), 
+                labels: Object.keys(corpSizes), // Corporation names
                 datasets: [
                     {
-                        label: 'Corp Size',
-                        data: Object.values(corpSizes), 
-                        backgroundColor: 'rgba(243, 156, 18, 0.8)',
-                        stack: 'Stack 0'
-                    },
-                    {
                         label: 'FATS Relative to Corp Size',
-                        data: Object.values(otherData), 
+                        data: Object.values(otherData),
                         backgroundColor: 'rgba(52, 73, 94, 0.8)',
                         stack: 'Stack 0'
                     }
                 ]
             },
             options: {
+                indexAxis: 'y', // Horizontal bar chart
                 maintainAspectRatio: false,
                 responsive: true,
                 scales: {
-                    x: { stacked: true },
-                    y: {
+                    x: {
                         stacked: true,
                         max: 100, 
                         ticks: { 
                             callback: value => value + '%' 
                         }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value, index) => Object.keys(corpSizes)[index], 
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
         });
+
 
     });
 </script>

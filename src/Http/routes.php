@@ -36,9 +36,24 @@ Route::group([
         'as' => 'seat-fleet-activity-tracker::allFleets',
     ]);
 
-    Route::get('/track_fleet/{id}', [
+    Route::get('/fleet/{id}', [
         'uses' => 'FATController@fleet',
         'as' => 'seat-fleet-activity-tracker::fleet',
+    ]);
+
+    Route::get('/settings', [
+        'uses' => 'FATController@settings',
+        'as' => 'seat-fleet-activity-tracker::settings',
+    ]);
+
+    Route::post('/settings/save', [
+        'uses' => 'FATController@postAddTrackedCorp',
+        'as' => 'seat-fleet-activity-tracker::postAddTrackedCorp',
+    ]);
+
+    Route::get('/settings/delete/{id}', [
+        'uses' => 'FATController@deletedTrackedCorp',
+        'as' => 'seat-fleet-activity-tracker::deletedTrackedCorp',
     ]);
 
 });

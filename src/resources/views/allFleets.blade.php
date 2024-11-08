@@ -29,7 +29,7 @@
                         @else
                             @foreach($fleets as $fleet)
                                 <tr>
-                                    <td>{{ $fleet->fleetName }}</td>
+                                    <td>{{ $fleet->fleetName }} @if($fleet->fleetActive) <span class="badge bg-primary ml-2">Active</span> @endif</td>
                                     <td>{{ $fleet->fleetType }}</td>
                                     <td>{{ $fleet->fleet_commander ? $fleet->fleet_commander->name : 'N/A' }}</td>
                                     <td>

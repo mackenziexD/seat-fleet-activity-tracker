@@ -5,9 +5,12 @@ namespace Helious\SeatFAT\Jobs;
 use Seat\Eveapi\Jobs\EsiBase;
 use Throwable;
 use Helious\SeatFAT\Models\FATFleets;
+use Seat\Eseye\Exceptions\RequestFailedException;
 
 abstract class AbstractFleetJob extends EsiBase
 {
+    const CHARACTER_NOT_FLEET_BOSS = "The fleet does not exist or you don't have access to it!";
+    
     protected $fleet_id;
     protected $token;
 
@@ -35,15 +38,19 @@ abstract class AbstractFleetJob extends EsiBase
 
     public function failed(Throwable $exception)
     {
-      if ($exception->getCode() === 404) {
-          // Mark the fleet as inactive
-          FATFleets::where('fleetID', $this->fleet_id)->update(['fleetActive' => false]);
-          \Log::error("Marking fleet ID: {$this->fleet_id} as inactive due to: " . $exception->getMessage());
-      } else {
-          // Log other exceptions or handle them as needed
-          \Log::error("An error occurred: " . $e->getMessage());
-      }
-      
-      parent::failed($exception);
+        if ($exception instanceof RequestFailedException) {
+            \Log::error($exception->getError());
+            if ($exception->getError() === self::CHARACTER_NOT_FLEET_BOSS) {
+                if (FATFleets::where('fleetID', $this->fleet_id)->exists()) {
+                    FATFleets::where('fleetID', $this->fleet_id)->update(['fleetActive' => false]);
+                    \Log::error("Fleet ID {$this->fleet_id} marked inactive. Reason: " . $exception->getMessage());
+                } else {
+                    \Log::warning("Fleet validation failed, but fleet ID {$this->fleet_id} was not found in database.");
+                }
+            }
+        }
+        
+        parent::failed($exception);
     }
+    
 }

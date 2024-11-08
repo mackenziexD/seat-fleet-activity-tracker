@@ -1,4 +1,4 @@
-@extends('web::layouts.grids.12', ['viewname' => 'seat-fleet-activity-tracker::about'])
+@extends('web::layouts.grids.12', ['viewname' => 'seat-fleet-activity-tracker::allFleets'])
 
 @section('title', 'SeAT-FAT')
 @section('page_header', 'Fleet - '. $fleet->fleetName )

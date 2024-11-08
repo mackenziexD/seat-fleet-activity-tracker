@@ -14,13 +14,12 @@ class ModifyFatFleetsFleetCommander extends Migration
     public function up()
     {
       Schema::table('seat_fat_fleets', function (Blueprint $table) {
-        $table->bigInteger('fleetCommander')->change();
-        $table->bigInteger('fleetID')->change();
-        $table->primary(['fleetID']);
+          $table->bigInteger('fleetCommander')->change();
+          $table->bigInteger('fleetID')->change();
       });
 
       Schema::table('seat_fats', function (Blueprint $table) {
-        $table->primary(['fleetID']);
+          $table->bigInteger('fleetID')->change(); 
       });
     }
 
@@ -34,10 +33,9 @@ class ModifyFatFleetsFleetCommander extends Migration
       Schema::table('seat_fat_fleets', function (Blueprint $table) {
         $table->bigInteger('fleetCommander')->change();
         $table->bigInteger('fleetID')->change();
-        $table->primary(['fleetID']);
       });
       Schema::table('seat_fats', function (Blueprint $table) {
-        $table->primary(['fleetID']);
+        $table->bigInteger('fleetID')->change(); 
       });
     }
 }

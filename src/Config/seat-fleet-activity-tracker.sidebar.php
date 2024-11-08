@@ -37,6 +37,14 @@ return [
                 'permission' => [
                   'fats.allFleets',
                 ],
+            ],
+            [
+                'name' => 'Settings',
+                'icon' => 'fas fa-tools',
+                'route' => 'seat-fleet-activity-tracker::settings',
+                'permission' => [
+                  'global.superuser',
+                ],
             ]
         ],
     ],

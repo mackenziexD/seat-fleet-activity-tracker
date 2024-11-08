@@ -4,6 +4,7 @@ namespace Helious\SeatFAT\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Seat\Eveapi\Models\Character\CharacterAffiliation;
+use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Eveapi\Models\Sde\InvType;
 use Seat\Eveapi\Models\Sde\SolarSystem;
 use Seat\Eveapi\Models\Universe\UniverseName;
@@ -36,11 +37,10 @@ class FATS extends Model
      */
     public function character()
     {
-      return $this->hasOne(UniverseName::class, 'entity_id', 'character_id')
-          ->withDefault([
-              'name' => trans('web::seat.unknown'),
-              'category' => 'character',
-          ]);
+        return $this->belongsTo(CharacterInfo::class, 'character_id', 'character_id')
+            ->with(['affiliation' => function ($query) {
+                $query->withDefault();
+            }]);
     }
 
     /**
