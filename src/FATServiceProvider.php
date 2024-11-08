@@ -3,7 +3,7 @@
 namespace Helious\SeatFAT;
 
 use Seat\Services\AbstractSeatPlugin;
-use Helious\SeatFAT\Console\PullFleetMembers;
+use Helious\SeatFAT\Commands\PullFleetMembers;
 
 class FATServiceProvider extends AbstractSeatPlugin
 {
