@@ -13,7 +13,7 @@ class FATServiceProvider extends AbstractSeatPlugin
         
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.config.php', 'seat-fleet-activity-tracker.config');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.locale.php', 'seat-fleet-activity-tracker.locale');
-        $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'FATS');
+        $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'fats');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
         $this->registerDatabaseSeeders(ScheduleSeeder::class);
         
@@ -26,7 +26,7 @@ class FATServiceProvider extends AbstractSeatPlugin
 
         $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
 
     }
 

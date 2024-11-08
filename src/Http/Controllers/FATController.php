@@ -242,7 +242,5 @@ class FATController extends Controller
           'corpSizes' => $corpSizes, 
           'otherData' => $otherData 
       ]);
-  }   
-  
-
+  } 
 }

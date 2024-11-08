@@ -4,7 +4,6 @@ namespace Helious\SeatFAT\Database\Seeders;
 
 use Seat\Services\Seeding\AbstractScheduleSeeder;
 
-
 class ScheduleSeeder extends AbstractScheduleSeeder
 {
 

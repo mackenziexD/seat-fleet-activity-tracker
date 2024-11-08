@@ -7,7 +7,7 @@ Route::group([
     'middleware' => [
         'web',
         'auth',
-        'can:seat-fleet-activity-tracker.access',
+        'can:fats.access',
     ],
 ], function()
 {
