@@ -12,7 +12,7 @@ class FATServiceProvider extends AbstractSeatPlugin
         
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.config.php', 'seat-fleet-activity-tracker.config');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.locale.php', 'seat-fleet-activity-tracker.locale');
-        $this->registerPermissions(__DIR__ . '/Config/Permissions/FATS.php', 'FATS');
+        $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'FATS');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
 
         

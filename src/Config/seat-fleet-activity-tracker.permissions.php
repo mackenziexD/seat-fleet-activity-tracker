@@ -1,4 +1,5 @@
 <?php
+
 return [
     'access' => [
         'label' => 'Access FATs',
