@@ -243,7 +243,7 @@
         new Chart(document.getElementById('FatsRelativeToCorpSize'), {
             type: 'bar',
             data: {
-                labels: Object.keys(corpSizes), // Corporation names
+                labels: Object.keys(corpSizes), 
                 datasets: [
                     {
                         label: 'FATS Relative to Corp Size',
@@ -254,7 +254,7 @@
                 ]
             },
             options: {
-                indexAxis: 'y', // Horizontal bar chart
+                indexAxis: 'y',
                 maintainAspectRatio: false,
                 responsive: true,
                 scales: {

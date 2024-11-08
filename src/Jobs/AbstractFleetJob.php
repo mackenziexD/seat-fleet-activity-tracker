@@ -39,7 +39,6 @@ abstract class AbstractFleetJob extends EsiBase
     public function failed(Throwable $exception)
     {
         if ($exception instanceof RequestFailedException) {
-            \Log::error($exception->getError());
             if ($exception->getError() === self::CHARACTER_NOT_FLEET_BOSS) {
                 if (FATFleets::where('fleetID', $this->fleet_id)->exists()) {
                     FATFleets::where('fleetID', $this->fleet_id)->update(['fleetActive' => false]);

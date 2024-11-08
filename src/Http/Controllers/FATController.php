@@ -151,10 +151,10 @@ class FATController extends Controller
         
         // Get FATS entries with characters in tracked corporations only
         $fatsEntries = FATS::with(['character.affiliation'])
-                            ->whereHas('character.affiliation', function($query) use ($trackedCorporationIds) {
-                                $query->whereIn('corporation_id', $trackedCorporationIds);
-                            })
-                            ->get();
+            ->whereHas('character.affiliation', function($query) use ($trackedCorporationIds) {
+                $query->whereIn('corporation_id', $trackedCorporationIds);
+            })
+            ->get();
     
         // Initialize data arrays
         $monthlyStats = [];

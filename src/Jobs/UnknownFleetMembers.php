@@ -50,7 +50,6 @@ class UnknownFleetMembers extends EsiBase
      */
     public function handle()
     {
-        // Log the characters being processed
         \Log::error("[UnknownFleetMembers] Processing unknown characters: " . implode(', ', $this->character_ids));
 
         // Get character IDs already in CharacterInfo
@@ -68,13 +67,10 @@ class UnknownFleetMembers extends EsiBase
         $unknown_character_ids->chunk($this->items_id_limit)->each(function ($chunk) {
             $this->request_body = $chunk->unique()->values()->all();
 
-            // Retrieve character info from ESI
             $response = $this->retrieve();
 
-            // Process the response
             $characters = $response->getBody();
 
-            // Save character details in CharacterInfo
             collect($characters)->each(function ($character) {
                 CharacterInfo::updateOrCreate(
                     ['character_id' => $character->id],
