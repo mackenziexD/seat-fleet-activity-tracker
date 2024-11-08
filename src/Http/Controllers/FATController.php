@@ -9,6 +9,8 @@ use Helious\SeatFAT\Models\FATS;
 use Seat\Eveapi\Models\RefreshToken;
 use Seat\Services\Contracts\EsiClient;
 use Helious\SeatFAT\Services\FATEsiToken;
+use Helious\SeatFAT\Jobs\ValidateFleet;
+use Illuminate\Support\Facades\Bus;
 
 /**
  * Class HomeController.
@@ -78,16 +80,17 @@ class FATController extends Controller
     ]);
 
     $fleetBoss = RefreshToken::where('character_id', $request->input('fleet_boss'))->first();
-    if(!$fleetBoss->token || !$fleetBoss->refresh_token){
+    if(!in_array('esi-fleets.read_fleet.v1', $fleetBoss->getScopes())){
       return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Could not find fleet boss on seat, try to re-link the character.');
     }
 
-    $fleet = $this->checkFleetIdIsCorrect($fleetBoss, $request->input('fleet_id'));
-    if (!$fleet) {
-      return redirect()->route('seat-fleet-activity-tracker::trackFleet')->with('error', 'Only fleet boss can track a fleet!');
+    $fleet_id = ValidateFleet::validateFleet($fleetBoss);
+    if (!$fleet_id) {
+        return redirect()->route('seat-fleet-activity-tracker::trackFleet')
+            ->with('error', 'Only fleet boss can track a fleet.');
     }
-
-    $existingFleet = FATFleets::where('fleetID', $fleet->fleet_id)
+    
+    $existingFleet = FATFleets::where('fleetID', $fleet_id)
         ->where('fleetCommander', $fleetBoss->character_id)
         ->where('fleetActive', true)
         ->first();
@@ -99,7 +102,7 @@ class FATController extends Controller
     $savedFleet = FATFleets::create([
         'fleetName' => $request->input('fleet_name'),
         'fleetType' => $request->input('fleet_type'),
-        'fleetID' => $fleet->fleet_id,
+        'fleetID' => $fleet_id,
         'fleetCommander' => $fleetBoss->character_id,
         'fleetActive' => true,
     ]);
@@ -119,34 +122,6 @@ class FATController extends Controller
     })->sortDesc();
 
     return view('seat-fleet-activity-tracker::fleet', compact('fleet', 'members', 'shipTypeCounts'));
-  }
-
-  private function checkFleetIdIsCorrect($fleetBoss)
-  {
-    /**
-     * This method bypasses the job queue to ensure the fleet ID is available immediately, 
-     * avoiding delays and manual input. While most ESI calls are deferred to jobs to handle 
-     * rate limits, this retrieval is crucial for real-time operations, so it's executed directly.
-     */
-    try {
-        $esiToken = new FATEsiToken();
-        $esiToken->setAccessToken($fleetBoss->token);
-        $esiToken->setRefreshToken($fleetBoss->refresh_token);
-        
-        if ($fleetBoss->expires_on) {
-          $esiToken->setExpiresOn(new \DateTime($fleetBoss->expires_on));
-        }
-        
-        $this->esi->setAuthentication($esiToken);
-        $response = $this->esi->invoke('get', '/characters/{character_id}/fleet/', [
-          'character_id' => $fleetBoss->character_id,
-        ]);
-        $body = $response->getBody();
-
-        if ($response->getStatusCode() == 200) return $body;
-    } catch (\Exception $e) {
-        return false;
-    }
   }
 
   public function stats()

@@ -43,5 +43,7 @@ abstract class AbstractFleetJob extends EsiBase
           // Log other exceptions or handle them as needed
           \Log::error("An error occurred: " . $e->getMessage());
       }
+      
+      parent::failed($exception);
     }
 }

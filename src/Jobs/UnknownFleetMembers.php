@@ -3,8 +3,7 @@
 namespace Helious\SeatFAT\Jobs;
 
 use Seat\Eveapi\Jobs\EsiBase;
-use Seat\Eveapi\Models\Universe\UniverseName;
-use Helious\SeatFAT\Models\FATS;
+use Seat\Eveapi\Models\Character\CharacterInfo;
 
 /**
  * Class UnknownFleetMembers.
@@ -14,7 +13,7 @@ use Helious\SeatFAT\Models\FATS;
 class UnknownFleetMembers extends EsiBase
 {
     /**
-     * The maximum number of entity ids we can request resolution for.
+     * The maximum number of entity IDs we can request in one batch.
      */
     protected $items_id_limit = 1000;
 
@@ -27,16 +26,6 @@ class UnknownFleetMembers extends EsiBase
      * @var string
      */
     protected $endpoint = '/universe/names/';
-
-    /**
-     * @var string
-     */
-    protected $version = 'v3';
-
-    /**
-     * @var array
-     */
-    protected $tags = ['fleets', 'universe'];
 
     /**
      * @var array
@@ -61,33 +50,36 @@ class UnknownFleetMembers extends EsiBase
      */
     public function handle()
     {
-        \Log::error("[FATs][Unknown Character] Getting character ID: " . $this->character_ids);
-        // Get existing entity IDs once
-        $existing_entity_ids = UniverseName::select('entity_id')
-            ->distinct()
-            ->pluck('entity_id');
+        // Log the characters being processed
+        \Log::error("[UnknownFleetMembers] Processing unknown characters: " . implode(', ', $this->character_ids));
 
-        // Prepare the entity IDs from the passed character IDs
-        $entity_ids = collect($this->character_ids)
-            ->diff($existing_entity_ids)
+        // Get character IDs already in CharacterInfo
+        $existing_character_ids = CharacterInfo::select('character_id')
+            ->whereIn('character_id', $this->character_ids)
+            ->pluck('character_id')
+            ->toArray();
+
+        // Filter out known characters to avoid duplicates
+        $unknown_character_ids = collect($this->character_ids)
+            ->diff($existing_character_ids)
             ->values();
 
-        // Chunk the entity IDs for processing
-        $entity_ids->chunk($this->items_id_limit)->each(function ($chunk) {
+        // Batch process remaining unknown characters
+        $unknown_character_ids->chunk($this->items_id_limit)->each(function ($chunk) {
             $this->request_body = $chunk->unique()->values()->all();
 
-            // Make the request to ESI
+            // Retrieve character info from ESI
             $response = $this->retrieve();
 
-            $resolutions = $response->getBody();
+            // Process the response
+            $characters = $response->getBody();
 
-            // Save or update the names in the database
-            collect($resolutions)->each(function ($resolution) {
-                UniverseName::firstOrNew(['entity_id' => $resolution->id])
-                    ->fill([
-                        'name' => $resolution->name,
-                        'category' => $resolution->category,
-                    ])->save();
+            // Save character details in CharacterInfo
+            collect($characters)->each(function ($character) {
+                CharacterInfo::updateOrCreate(
+                    ['character_id' => $character->id],
+                    ['name' => $character->name, 'corporation_id' => $character->corporation_id]
+                );
             });
         });
     }

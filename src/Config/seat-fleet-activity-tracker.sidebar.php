@@ -4,7 +4,7 @@ return [
     'seat-fleet-activity-tracker' => [
         'name' => 'Fleet Activity Tracker',
         'icon' => 'fas fa-rocket',
-        'route_segment' => 'fleet',
+        'route_segment' => 'fats',
         'entries' => [
             [
                 'name' => 'Dashboard',

@@ -13,6 +13,11 @@ class FATServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.php', 'seat-fleet-activity-tracker');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
         $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'seat-fleet-activity-tracker');
+
+        
+        $this->registerDatabaseSeeders([
+            \Helious\SeatFAT\Database\Seeders\ScheduleSeeder::class,
+        ]);
         
     }
 
@@ -31,19 +36,7 @@ class FATServiceProvider extends AbstractSeatPlugin
         $this->commands([
             PullFleetMembers::class,
         ]);
-    }
-
-    /**
-     * Get the package's routes.
-     *
-     * @return string
-     */
-    protected function getRouteFile()
-    {
-        return __DIR__.'/routes.php';
-    }
-
-    
+    }    
 
     /**
      * Return the plugin public name as it should be displayed into settings.

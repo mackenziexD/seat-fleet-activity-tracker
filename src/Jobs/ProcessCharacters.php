@@ -4,10 +4,10 @@ namespace Helious\SeatFAT\Jobs;
 
 use Helious\SeatFAT\Jobs\AbstractFleetJob;
 use Helious\SeatFAT\Models\FATS;
-use Helious\SeatFAT\Models\FATFleets;
 use Carbon\Carbon;
-use Helious\SeatFAT\Jobs\UnknownFleetMembers;
-use Seat\Eveapi\Models\Universe\UniverseName;
+use Seat\Eveapi\Models\Character\CharacterInfo;
+use Seat\Eveapi\Jobs\Character\Info;
+use Illuminate\Support\Facades\Bus;
 
 class ProcessCharacters extends AbstractFleetJob
 {
@@ -24,30 +24,32 @@ class ProcessCharacters extends AbstractFleetJob
 
     public function handle()
     {
-      parent::handle();
-      \Log::error("Processing fleet ID: " . $this->fleet_id);
-  
-      $response = $this->retrieve([
-          'fleet_id' => $this->fleet_id
-      ]);
+        parent::handle();
 
-      $members = $response->getBody();
-      collect($members)->each(function ($member) {
-          FATS::insertOrIgnore([
-              'character_id' => $member->character_id,
-              'solar_system_id' => $member->solar_system_id,
-              'ship_type_id' => $member->ship_type_id,
-              'fleetID' => $this->fleet_id,
-              'created_at' => Carbon::now(),
-          ]);
+        $response = $this->retrieve([
+            'fleet_id' => $this->fleet_id
+        ]);
 
-          $isKnownCharacter = UniverseName::where('entity_id', $member->character_id)->exists();
+        $members = $response->getBody();
+        $unknownCharacterJobs = [];
 
-          if (!$isKnownCharacter) {
-              UnknownFleetMembers::dispatch([$member->character_id])
-                  ->onQueue('default');
-          }
-      });
+        collect($members)->each(function ($member) use (&$unknownCharacterJobs) {
+            FATS::insertOrIgnore([
+                'character_id' => $member->character_id,
+                'solar_system_id' => $member->solar_system_id,
+                'ship_type_id' => $member->ship_type_id,
+                'fleetID' => $this->fleet_id,
+                'created_at' => Carbon::now(),
+            ]);
+
+            if (!CharacterInfo::where('character_id', $member->character_id)->exists()) {
+                $unknownCharacterJobs[] = new Info($member->character_id);
+            }
+        });
+
+        // Dispatch all Info jobs in batch for unknown characters
+        if (!empty($unknownCharacterJobs)) {
+            Bus::batch($unknownCharacterJobs)->onQueue('default')->dispatch();
+        }
     }
-
 }

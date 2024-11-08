@@ -1,6 +1,6 @@
 <?php
 
-namespace Helious\SeatFAT\Console;
+namespace Helious\SeatFAT\Commands\Fats;
 
 use Illuminate\Console\Command;
 use Helious\SeatFAT\Jobs\ProcessCharacters;
@@ -8,7 +8,7 @@ use Helious\SeatFAT\Models\FATFleets;
 use Seat\Eveapi\Models\RefreshToken;
 
 /**
- * Class CheckBeaconFuel.
+ * Class PullFleetMembers.
  *
  * @package Helious\SeatFAT\Console
  */
