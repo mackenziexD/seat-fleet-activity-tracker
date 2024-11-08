@@ -4,6 +4,7 @@ namespace Helious\SeatFAT;
 
 use Seat\Services\AbstractSeatPlugin;
 use Helious\SeatFAT\Commands\Fats\PullFleetMembers;
+use Helious\SeatFAT\Database\Seeders\ScheduleSeeder;
 
 class FATServiceProvider extends AbstractSeatPlugin
 {
@@ -14,11 +15,7 @@ class FATServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.locale.php', 'seat-fleet-activity-tracker.locale');
         $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'FATS');
         $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
-
-        
-        $this->registerDatabaseSeeders([
-            \Helious\SeatFAT\Database\Seeders\ScheduleSeeder::class,
-        ]);
+        $this->registerDatabaseSeeders(ScheduleSeeder::class);
         
     }
 
