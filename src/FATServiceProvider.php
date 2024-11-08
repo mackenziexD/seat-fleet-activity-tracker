@@ -10,9 +10,10 @@ class FATServiceProvider extends AbstractSeatPlugin
     public function register()
     {
         
-        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.php', 'seat-fleet-activity-tracker');
-        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
+        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.config.php', 'seat-fleet-activity-tracker.config');
+        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.locale.php', 'seat-fleet-activity-tracker.locale');
         $this->registerPermissions(__DIR__ . '/Config/seat-fleet-activity-tracker.permissions.php', 'seat-fleet-activity-tracker');
+        $this->mergeConfigFrom(__DIR__ . '/Config/seat-fleet-activity-tracker.sidebar.php', 'package.sidebar');
 
         
         $this->registerDatabaseSeeders([
@@ -24,8 +25,9 @@ class FATServiceProvider extends AbstractSeatPlugin
     public function boot()
     {
         $this->addCommands();
+        $this->add_translations();
 
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'seat-fleet-activity-tracker');
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
@@ -36,7 +38,12 @@ class FATServiceProvider extends AbstractSeatPlugin
         $this->commands([
             PullFleetMembers::class,
         ]);
-    }    
+    }
+
+    private function add_translations()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'seat-fleet-activity-tracker');
+    }
 
     /**
      * Return the plugin public name as it should be displayed into settings.
